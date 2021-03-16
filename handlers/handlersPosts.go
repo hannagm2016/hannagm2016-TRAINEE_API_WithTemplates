@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"site/models"
 	"strconv"
+	"site/repository"
 )
 
 const (
@@ -15,10 +16,10 @@ const (
 var Posts []models.Post
 
 type handler struct {
-	PostModel models.PostModelImpl
+	PostModel repository.PostModelImpl
 }
 
-func NewHandler(p models.PostModelImpl) *handler {
+func NewHandler(p repository.PostModelImpl) *handler {
 	return &handler{p}
 }
 
