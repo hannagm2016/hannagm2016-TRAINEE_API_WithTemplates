@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"site/config"
 )
 
 var inMemorySession *session.Session
@@ -87,28 +88,6 @@ func GetAccessToken(client_id string, code string, secret string, callbackUri st
 	return token
 }
 
-// Logout godoc
-// @Summary Log out, remove authorisation
-// @Description Removing cookie, set IsAuthorize as false
-// @Tags User
-// @Accept  json
-// @Produce  json
-// @Success 200 {string} string "user logged out"
-// @Failure 500 {string} string "fail"
-// @Router /logout [get]
-func (h *handler) Logout(c echo.Context) error {
-	fmt.Println("Endpoint Hit: logout", cookie)
-	cookie = &http.Cookie{
-		Name:    COOKIE_NAME,
-		Value:   "",
-		Expires: time.Now(),
-	}
-	c.SetCookie(cookie)
-	//  Customer=new(models.User)
-	fmt.Println("Endpoint Hit: logout", cookie)
-	return c.Redirect(http.StatusMovedPermanently, "/")
-}
-
 // Authorisation godoc
 // @Summary Authorisation form
 // @Description Entering login and pass into authorisation form
@@ -122,10 +101,11 @@ func (h *handler) Authorisation(c echo.Context) error {
 
 	inMemorySession = session.NewSession()
 	fmt.Println("Endpoint Hit: authorisation")
+fb:= config.GetConfig("fb")
 	fbConfig := &oauth2.Config{
-		ClientID:     "1082108638933790",
-		ClientSecret: "9131adf363836e2566e737a165fb4a2a",
-		RedirectURL:  "http://localhost:8000/FBLogin",
+	    ClientID: fb.ClientID,
+		ClientSecret: fb.ClientSecret,
+		RedirectURL:  fb.RedirectURL,
 		Scopes:       []string{"email", "user_birthday", "user_location"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  "https://www.facebook.com/dialog/oauth",
@@ -133,10 +113,11 @@ func (h *handler) Authorisation(c echo.Context) error {
 		},
 	}
 	FB := fbConfig.AuthCodeURL("")
+	google:=config.GetConfig("google")
 	GoogleConfig := oauth2.Config{
-		ClientID:     "11049513161-jutu1327d9pmu8pqlqoj1qgg0llg6iii.apps.googleusercontent.com",
-		ClientSecret: "WxDmsCjsCYqjHTT9ClodlTNv",
-		RedirectURL:  "http://localhost:8000/GoogleLogin",
+		ClientID: google.ClientID,
+        ClientSecret: google.ClientSecret,
+        RedirectURL:  google.RedirectURL,
 		Scopes:       []string{"email"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:   "https://accounts.google.com/o/oauth2/auth",
@@ -145,45 +126,17 @@ func (h *handler) Authorisation(c echo.Context) error {
 		},
 	}
 	Google := GoogleConfig.AuthCodeURL("")
-	fmt.Println(FB, Google)
+fmt.Println(FB, Google)
 	return c.Render(http.StatusOK, "authorisation.html", map[string]string{
 		"FB":     FB,
 		"Google": Google,
 	})
 }
 
-// AuthorisationPost godoc
-// @Summary Authorisation process
-// @Description Creating cookie, set IsAuthorize as true
-// @Tags User
-// @Accept  json
-// @Produce  json
-// @Success 200 {string} string "user authorised"
-// @Failure 500 {string} string "fail"
-// @Router /authorisationPost [post]
-func (h *handler) AuthorisationPost(c echo.Context) error {
-	inputEmail := c.FormValue("inputEmail")
-	inputPassword := c.FormValue("inputPassword")
-	fmt.Println(inputPassword, inputEmail)
-	sessionId := inMemorySession.Init(inputEmail)
-	cookie = &http.Cookie{
-		Name:    COOKIE_NAME,
-		Value:   sessionId,
-		Expires: time.Now().Add(5 * time.Minute),
-		MaxAge:  60 * 60,
-	}
-	Customer = h.PostModel.FindCustomerByEmail(inputEmail)
-
-	c.SetCookie(cookie)
-	fmt.Println("Endpoint Hit: authorisation", Customer)
-	return c.Redirect(http.StatusMovedPermanently, "/")
-}
 func (h *handler) FBLogin(c echo.Context) error {
 	code := c.FormValue("code")
-	ClientId := "1082108638933790"
-	ClientSecret := "9131adf363836e2566e737a165fb4a2a"
-	RedirectURL := "http://localhost:8000/FBLogin"
-	accessToken := GetAccessToken(ClientId, code, ClientSecret, RedirectURL)
+	fb:= config.GetConfig("fb")
+	accessToken := GetAccessToken(fb.ClientID, code, fb.ClientSecret, fb.RedirectURL)
 	response, err := http.Get("https://graph.facebook.com/me?access_token=" + accessToken.Token)
 	if err != nil {
 		fmt.Println(err)
@@ -213,10 +166,8 @@ func (h *handler) FBLogin(c echo.Context) error {
 }
 func (h *handler) GoogleLogin(c echo.Context) error {
 	code := c.FormValue("code")
-	ClientId := "11049513161-jutu1327d9pmu8pqlqoj1qgg0llg6iii.apps.googleusercontent.com"
-	ClientSecret := "WxDmsCjsCYqjHTT9ClodlTNv"
-	RedirectURL := "http://localhost:8000/GoogleLogin"
-	accessToken := GetAccessToken(ClientId, code, ClientSecret, RedirectURL)
+	google:=config.GetConfig("google")
+	accessToken := GetAccessToken(google.ClientID, code, google.ClientSecret, google.RedirectURL)
 	response, err := http.Get("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + accessToken.Token)
 	if err != nil {
 		fmt.Println(err)
@@ -241,6 +192,33 @@ func (h *handler) GoogleLogin(c echo.Context) error {
 		Customer.Id = h.PostModel.FindCustomerId(email)
 	}
 	fmt.Println("Endpoint Hit: GoogleLogin", cookie)
+	return c.Redirect(http.StatusMovedPermanently, "/")
+}
+
+// AuthorisationPost godoc
+// @Summary Authorisation process
+// @Description Creating cookie, set IsAuthorize as true
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Success 200 {string} string "user authorised"
+// @Failure 500 {string} string "fail"
+// @Router /authorisationPost [post]
+func (h *handler) AuthorisationPost(c echo.Context) error {
+	inputEmail := c.FormValue("inputEmail")
+	inputPassword := c.FormValue("inputPassword")
+	fmt.Println(inputPassword, inputEmail)
+	sessionId := inMemorySession.Init(inputEmail)
+	cookie = &http.Cookie{
+		Name:    COOKIE_NAME,
+		Value:   sessionId,
+		Expires: time.Now().Add(5 * time.Minute),
+		MaxAge:  60 * 60,
+	}
+	Customer = h.PostModel.FindCustomerByEmail(inputEmail)
+
+	c.SetCookie(cookie)
+	fmt.Println("Endpoint Hit: authorisation", Customer)
 	return c.Redirect(http.StatusMovedPermanently, "/")
 }
 
@@ -284,5 +262,27 @@ func (h *handler) RegistrationPost(c echo.Context) error {
 	}
 	c.SetCookie(cookie)
 
+	return c.Redirect(http.StatusMovedPermanently, "/")
+}
+
+// Logout godoc
+// @Summary Log out, remove authorisation
+// @Description Removing cookie, set IsAuthorize as false
+// @Tags User
+// @Accept  json
+// @Produce  json
+// @Success 200 {string} string "user logged out"
+// @Failure 500 {string} string "fail"
+// @Router /logout [get]
+func (h *handler) Logout(c echo.Context) error {
+	fmt.Println("Endpoint Hit: logout", cookie)
+	cookie = &http.Cookie{
+		Name:    COOKIE_NAME,
+		Value:   "",
+		Expires: time.Now(),
+	}
+	c.SetCookie(cookie)
+	//  Customer=new(models.User)
+	fmt.Println("Endpoint Hit: logout", cookie)
 	return c.Redirect(http.StatusMovedPermanently, "/")
 }
