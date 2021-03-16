@@ -1,4 +1,4 @@
-package routers
+package handlers
 
 import (
 	"net/http"
@@ -10,17 +10,16 @@ import (
 	"site/models"
 )
 
-type 	PostsModelStub struct{}
-
+type PostsModelStub struct{}
 
 func (y *PostsModelStub) FindAll() []models.Post {
 	posts := []models.Post{}
-	posts = append (posts, models.Post{
-                  UserId: 1.,
-                  Id: 1.,
-                  Title: "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-                  Body: "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto",
-                })
+	posts = append(posts, models.Post{
+		UserId: 1.,
+		Id:     1.,
+		Title:  "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+		Body:   "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto",
+	})
 	return posts
 }
 
@@ -48,4 +47,3 @@ func TestGetIndex(t *testing.T) {
 		assert.Equal(t, userJSON, rec.Body.String())
 	}
 }
-

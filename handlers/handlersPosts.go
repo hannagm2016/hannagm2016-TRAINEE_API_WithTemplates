@@ -1,24 +1,28 @@
-package routers
+package handlers
 
 import (
-	"net/http"
+	"fmt"
 	"github.com/labstack/echo"
-    "site/models"
-    "fmt"
-    "strconv"
+	"net/http"
+	"site/models"
+	"strconv"
+	"site/repository"
 )
+
 const (
-    COOKIE_NAME ="sessionId"
+	COOKIE_NAME = "sessionId"
 )
+
 var Posts []models.Post
 
 type handler struct {
-	PostModel models.PostModelImpl
+	PostModel repository.PostModelImpl
 }
 
-func NewHandler (p models.PostModelImpl) *handler {
+func NewHandler(p repository.PostModelImpl) *handler {
 	return &handler{p}
 }
+
 // Index godoc
 // @Summary Show all post
 // @Description all posts
@@ -30,14 +34,16 @@ func NewHandler (p models.PostModelImpl) *handler {
 func (h *handler) Index(c echo.Context) error {
 	Posts = h.PostModel.FindAll()
 	var Model models.BaseModel
-	 cookie,_=c.Cookie(COOKIE_NAME)
-    	    if cookie != nil{
-    	 Model.IsAuthorized=true}
-    	 Model.Posts=Posts
-    	 Model.Cust=Customer
+	cookie, _ = c.Cookie(COOKIE_NAME)
+	if cookie != nil {
+		Model.IsAuthorized = true
+	}
+	Model.Posts = Posts
+	Model.Cust = Customer
 
 	return c.Render(http.StatusOK, "index2.html", Model)
 }
+
 // ReturnSinglePost godoc
 // @Summary Show single post with id specified
 // @Description get post by ID
@@ -50,10 +56,11 @@ func (h *handler) Index(c echo.Context) error {
 // @Router /post/{id} [get]
 func (h *handler) ReturnSinglePost(c echo.Context) error {
 	id := c.Param("id")
-	key,_:= strconv.ParseFloat(string(id), 64)
+	key, _ := strconv.ParseFloat(string(id), 64)
 	post := h.PostModel.FindByID(key)
 	return c.Render(http.StatusOK, "onepost2.html", post)
 }
+
 // DeletePost godoc
 // @Summary Delete one post with id specified
 // @Description delete post by ID
@@ -66,15 +73,15 @@ func (h *handler) ReturnSinglePost(c echo.Context) error {
 // @Failure 404 {string} string "not found"
 // @Router /deletePost/{id} [delete]
 func (h *handler) DeletePost(c echo.Context) error {
-	cookie,_=c.Cookie(COOKIE_NAME)
-    	    if cookie == nil{
-    	    //c.String(http.StatusForbidden, "Not registered")
-             return c.Redirect(http.StatusMovedPermanently, "/")
-    	    }
+	cookie, _ = c.Cookie(COOKIE_NAME)
+	if cookie == nil {
+		//c.String(http.StatusForbidden, "Not registered")
+		return c.Redirect(http.StatusMovedPermanently, "/")
+	}
 	id := c.Param("id")
-	key,_:= strconv.ParseFloat(string(id), 64)
+	key, _ := strconv.ParseFloat(string(id), 64)
 	h.PostModel.DeleteByID(key)
-    fmt.Println("Endpoint Hit: DeletePost" , id)
+	fmt.Println("Endpoint Hit: DeletePost", id)
 	return c.Redirect(http.StatusMovedPermanently, "/")
 }
 
@@ -90,15 +97,16 @@ func (h *handler) DeletePost(c echo.Context) error {
 // @Router /savePost [post]
 func (h *handler) SavePost(c echo.Context) error {
 	var post models.Post
-           post.Id,_=strconv.ParseFloat(c.FormValue("id"),0)
-              post.Title=c.FormValue("title")
-              post.Body=c.FormValue("body")
-              post.UserId=Customer.Id//Later would be User ID from authorisation
-              h.PostModel.SaveByID(post)
+	post.Id, _ = strconv.ParseFloat(c.FormValue("id"), 0)
+	post.Title = c.FormValue("title")
+	post.Body = c.FormValue("body")
+	post.UserId = Customer.Id //Later would be User ID from authorisation
+	h.PostModel.SaveByID(post)
 
-	 fmt.Println("Endpoint Hit: InsertrPost")
-	 return  c.Redirect(http.StatusMovedPermanently, "/")
+	fmt.Println("Endpoint Hit: InsertrPost")
+	return c.Redirect(http.StatusMovedPermanently, "/")
 }
+
 // CreateNewPost godoc
 // @Summary Form for creation new post
 // @Description Form for creation new post
@@ -110,14 +118,15 @@ func (h *handler) SavePost(c echo.Context) error {
 // @Failure 403 {string} string "not registered"
 // @Failure 404 {string} string "not found"
 // @Router /post [get]
-func (h *handler) CreateNewPost(c echo.Context) error  {
-cookie,_=c.Cookie(COOKIE_NAME)
-fmt.Println(cookie)
-	    if cookie ==nil{
-           return c.Redirect(http.StatusMovedPermanently, "/")
-	    }
-         	return c.Render(http.StatusOK, "create.html", map[string]interface{}{})
-    }
+func (h *handler) CreateNewPost(c echo.Context) error {
+	cookie, _ = c.Cookie(COOKIE_NAME)
+	fmt.Println(cookie)
+	if cookie == nil {
+		return c.Redirect(http.StatusMovedPermanently, "/")
+	}
+	return c.Render(http.StatusOK, "create.html", map[string]interface{}{})
+}
+
 // EditPost godoc
 // @Summary Form for updating post
 // @Description Get post and edit it
@@ -129,15 +138,15 @@ fmt.Println(cookie)
 // @Failure 403 {string} string "not registered"
 // @Failure 404 {string} string "not found"
 // @Router /postUpdate/{id} [get]
-func (h *handler) EditPost (c echo.Context) error {
-     cookie,_=c.Cookie(COOKIE_NAME)
- 	    if cookie == nil{
- 	            return c.Redirect(http.StatusMovedPermanently, "/")
- 	    }
- 	    fmt.Println(Customer)
-           id:= c.Param("id")
-               key,_:= strconv.ParseFloat(string(id), 64)
-                post := h.PostModel.FindByID(key)
-            	return c.Render(http.StatusOK, "create.html", post)
+func (h *handler) EditPost(c echo.Context) error {
+	cookie, _ = c.Cookie(COOKIE_NAME)
+	if cookie == nil {
+		return c.Redirect(http.StatusMovedPermanently, "/")
+	}
+	fmt.Println(Customer)
+	id := c.Param("id")
+	key, _ := strconv.ParseFloat(string(id), 64)
+	post := h.PostModel.FindByID(key)
+	return c.Render(http.StatusOK, "create.html", post)
 
 }
