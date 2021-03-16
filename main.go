@@ -9,7 +9,7 @@ import (
 	"site/db"
 	_ "site/docs"
 	"site/models"
-	"site/routers"
+	"site/handlers"
 )
 
 // @title Swagger Example API for trainee exercise
@@ -37,7 +37,7 @@ func main() {
 	render_htmls.Add("create.html", template.Must(template.ParseFiles("templates/create.html")))
 	e := echo.New()
 	d := db.DBConnect()
-	h := routers.NewHandler(models.NewPostModel(d))
+	h := handlers.NewHandler(models.NewPostModel(d))
 	e.Renderer = render_htmls
 	e.GET("/", h.Index)
 	e.GET("/post/:id", h.ReturnSinglePost)
