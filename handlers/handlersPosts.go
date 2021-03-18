@@ -40,8 +40,8 @@ func (h *handler) Index(c echo.Context) error {
 	}
 	Model.Posts = Posts
 	Model.Cust = Customer
-
-	return c.Render(http.StatusOK, "index2.html", Model)
+    	  fmt.Println("Endpoint Hit: Index" )
+	return c.JSON(http.StatusOK, Model)
 }
 
 // ReturnSinglePost godoc

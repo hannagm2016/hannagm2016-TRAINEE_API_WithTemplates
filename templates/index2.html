@@ -7,7 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Main Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
 </head>
 <body>
 <header>
@@ -36,9 +35,8 @@
                 <strong>Posts </strong>
                 <h5 class="text-muted"> <- Go to main page</h5>
             </a>
-            {{ if .IsAuthorized}}
-            <h5 class="text-muted">Hello {{.Cust.UserName}}</h5>
-            {{ end }}
+
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -47,7 +45,8 @@
 </header>
 <script src="https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 
-<main>
+<main id="app">
+    <h5  v-if="posts.IsAuthorized" class="text-muted">Hello {{posts.Cust.UserName}}</h5>
 
     <section class="py-5 text-center container">
         <div class="row py-lg-5">
@@ -55,13 +54,12 @@
                 <h1 class="fw-light">All posts</h1>
                 <p class="lead text-muted">Only authorized users can leave coments and add or change posts</p>
                 <p>
+                    <span v-if="posts.IsAuthorized">
+                        <a href="/post" class="btn btn-secondary my-2">Create Post</a>
+                    <a  href="/logout" class="btn my-2">Logout</a>
+                    </span>
+                    <a v-else href="/authorisation" class="btn btn-primary my-2">Authorisation</a>
 
-                    {{ if .IsAuthorized}}
-                    <a href="/post" class="btn btn-secondary my-2">Create Post</a>
-                    <a href="/logout" class="btn my-2">Logout</a>
-                    {{ else }}
-                    <a href="/authorisation" class="btn btn-primary my-2">Authorisation</a>
-                    {{ end }}
 
                 </p>
             </div>
@@ -72,28 +70,25 @@
         <div class="container">
 
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                {{ range $value := .Posts }}
-
-                <div class="card" >
+                <div class="card" id="app"  v-for="post in posts.Posts">
 
                     <div class="card-body">
-                        <p class="card-text">{{ $value.Title }}</p>
+                        <p class="card-text">{{ post.Title }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
-                                <a href="/post/{{ $value.Id }}" class="btn btn-sm btn-outline-secondary">View</a>
-                                {{ if $.IsAuthorized}}
-                                <a href="/postUpdate/{{ $value.Id }}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                <a href="/deletePost/{{ $value.Id}}" class="btn btn-sm btn-outline-secondary">Delete</a>
-                                {{ end }}
+                                <a v-bind:href="'/post/'+ post.Id"  class="btn btn-sm btn-outline-secondary">View</a>
+                                <span v-if="posts.IsAuthorized">
+                                <a v-bind:href="'/postUpdate/'+ post.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <a v-bind:href="'/deletePost/'+ post.Id" class="btn btn-sm btn-outline-secondary">Delete</a>
+                                </span>
+
                             </div>
-                            <small class="text-muted">{{ $value.UserId }}</small>
+                            <small class="text-muted">{{ post.UserId }}</small>
                         </div>
                     </div>
 
                 </div>
-                {{ else }}
-                <p class ="lead">No articles</p>
-                {{ end }}
+
 
             </div>
         </div>
@@ -110,6 +105,23 @@
 
     </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script>
+      new Vue({
+  el: '#app',
+  data: {
+   posts: [],
+  },
+  mounted() {
+    fetch("/posts")
+      .then(response =>response.json())
+      .then((data)=>{
+       this.posts = data;
+  })
+  }
+})
+</script>
 
 </body>
 </html>
