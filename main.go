@@ -8,12 +8,11 @@ import (
 	"io"
 	"site/db"
 	_ "site/docs"
-//	"site/models"
+	//	"site/models"
+	"github.com/labstack/echo/middleware"
 	"site/handlers"
 	"site/repository"
-	"github.com/labstack/echo/middleware"
 	//"net/http"
-
 )
 
 // @title Swagger Example API for trainee exercise
@@ -43,7 +42,7 @@ func main() {
 	e.Renderer = render_htmls
 	e.File("/", "templates/index2.html")
 	e.GET("/posts", h.Index)
-	e.GET("/posts/:id", h.ReturnSinglePost)//was GET
+	e.GET("/posts/:id", h.ReturnSinglePost) //was GET
 	e.GET("/authorization", h.Authorisation)
 	e.GET("/logout", h.Logout)
 	e.GET("/registration", h.Registration)

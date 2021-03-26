@@ -1,6 +1,7 @@
 package repository
+
 import (
-    "site/models"
+	"site/models"
 )
 
 func (p *PostModel) CreateUser(user models.User) {
