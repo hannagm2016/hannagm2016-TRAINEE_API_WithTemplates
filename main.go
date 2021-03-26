@@ -11,6 +11,9 @@ import (
 //	"site/models"
 	"site/handlers"
 	"site/repository"
+	"github.com/labstack/echo/middleware"
+	//"net/http"
+
 )
 
 // @title Swagger Example API for trainee exercise
@@ -30,27 +33,23 @@ import (
 func main() {
 
 	render_htmls := NewTemplate()
-	//render_htmls.Add("index2.html", template.Must(template.ParseFiles("templates/index2.html")))
-	render_htmls.Add("onepost2.html", template.Must(template.ParseFiles("templates/onepost2.html")))
 	render_htmls.Add("authorisation.html", template.Must(template.ParseFiles("templates/authorisation.html")))
 	render_htmls.Add("registration.html", template.Must(template.ParseFiles("templates/registration.html")))
-	//render_htmls.Add("header.html", template.Must(template.ParseFiles("templates/header.html")))
-	render_htmls.Add("create.html", template.Must(template.ParseFiles("templates/create.html")))
 	e := echo.New()
+
+	e.Use(middleware.CORS())
 	d := db.DBConnect()
 	h := handlers.NewHandler(repository.NewPostModel(d))
 	e.Renderer = render_htmls
-	 e.File("/", "templates/index2.html")
-      	e.GET("/posts", h.Index)
-	e.GET("/post/:id", h.ReturnSinglePost)
-	e.GET("/authorisation", h.Authorisation)
+	e.File("/", "templates/index2.html")
+	e.GET("/posts", h.Index)
+	e.GET("/posts/:id", h.ReturnSinglePost)//was GET
+	e.GET("/authorization", h.Authorisation)
 	e.GET("/logout", h.Logout)
 	e.GET("/registration", h.Registration)
-	e.GET("/post", h.CreateNewPost)
 	e.GET("/FBLogin", h.FBLogin)
 	e.GET("/GoogleLogin", h.GoogleLogin)
-	e.GET("/deletePost/:id", h.DeletePost)
-	e.GET("/postUpdate/:id", h.EditPost)
+	e.DELETE("/deletePost/:id", h.DeletePost)
 	e.POST("/authorisationPost", h.AuthorisationPost)
 	e.POST("/registrationPost", h.RegistrationPost)
 	e.POST("/savePost", h.SavePost)

@@ -44,7 +44,7 @@
     </div>
 </header>
 <script src="https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <main id="app">
     <h5  v-if="posts.IsAuthorized" class="text-muted">Hello {{posts.Cust.UserName}}</h5>
 
@@ -76,15 +76,21 @@
                         <p class="card-text">{{ post.Title }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
+                                <button v-on:click="viewPost(post)">View</button>
+
                                 <a v-bind:href="'/post/'+ post.Id"  class="btn btn-sm btn-outline-secondary">View</a>
                                 <span v-if="posts.IsAuthorized">
                                 <a v-bind:href="'/postUpdate/'+ post.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                <a v-bind:href="'/deletePost/'+ post.Id" class="btn btn-sm btn-outline-secondary">Delete</a>
-                                </span>
+                                <button v-on:click="deletePost(post.Id)"  class="btn btn-sm btn-outline-secondary">Delete</button>
+                                 </span>
 
                             </div>
                             <small class="text-muted">{{ post.UserId }}</small>
                         </div>
+                        <div v-if="editPost === post.Id">
+                        <input v-on:keyup.13="viewPost(post)" v-model="post.body" />
+                        <button v-on:click="viewPost(post)">save</button>
+                    </div>
                     </div>
 
                 </div>
@@ -106,19 +112,42 @@
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
 <script>
       new Vue({
   el: '#app',
   data: {
+  editPost: null,
    posts: [],
   },
+     methods: {
+    deletePost(id) {
+        fetch("/deletePost/"+id, {
+            method:"DELETE"
+        })
+        .then(() => {
+console.log("DELETED", id)
+        })
+         },
+    viewPost(post) {
+            fetch("/posts/"+ post.Id, {
+                body: JSON.stringify(post),
+                method:"PUT",
+                headers: {
+                "Content-Type": "application/json",
+                },
+            })
+            .then(() => {
+                this.editPost  = null;
+            })
+             }
+    },
   mounted() {
     fetch("/posts")
       .then(response =>response.json())
       .then((data)=>{
        this.posts = data;
-  })
+      })
   }
 })
 </script>

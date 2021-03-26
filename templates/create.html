@@ -48,29 +48,23 @@
 
 <main>
 
-    <section class="py-5 text-center container">
+    <section  class="py-5 text-center container">
         <div class="row py-lg-5">
             <div class="col-lg-6 col-md-8 mx-auto">
 
-                <h1  class="cover-heading py-lg-5">{{ if .Id }}Updating article
-                {{ else }}
-                Adding new article
-                {{ end }}</h1>
+                <h1 v-if="post.Id" class="cover-heading py-lg-5">Updating article</h1>
+                    <h1 v-else class="cover-heading py-lg-5">Adding new article</h1>
                 <div>
                 <form action="/savePost" method="post" >
-                    <input type="hidden" name="id" value="{{.Id}}" />
-                    <input type="text" name="title" placeholder="Title of your post" class="form-control" value="{{ .Title}}"><br>
-                    <textarea name="body" id="body"  placeholder="Body of your post" class="form-control">{{.Body}}</textarea><br>
+                    <input type="hidden" name="id" value="post.Id" />
+                    <input type="text" name="title" placeholder="Title of your post" class="form-control" value="post.Title"><br>
+                    <textarea name="body" id="body"  placeholder="Body of your post" class="form-control"></textarea><br>
                     <button class="btn btn-primary my-2">Create</button>
                 </form>
                 </div>
             </div>
         </div>
-        <div class="col-xs-4">
-            {{ if .Id }}
-            <a href="/deletePost/{{.Id}}">Delete</a>
-            {{ end }}
-        </div>
+
     </section>
 
 
@@ -84,6 +78,23 @@
         <p class="mb-1">Album example is © Bootstrap</p>
     </div>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script>
+      new Vue({
+  el: '#app',
+  data: {
+   posts: [],
+  },
+  mounted() {
+    fetch("/posts/66")
+      .then(response =>response.json())
+      .then((data)=>{
+       this.posts = data;
+  })
+  }
+})
+</script>
 
 </body>
 </html>

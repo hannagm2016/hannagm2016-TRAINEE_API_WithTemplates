@@ -7,7 +7,15 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Main Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+     <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <!-- Vue.js -->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.24/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue-resource/0.7.0/vue-resource.min.js"></script>
 </head>
 <body>
 
@@ -45,22 +53,37 @@
 </header>
 <script src="https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 
-<main id="app_2">
 
-    <hr>
-    <div  class="album py-5 bg-light" style="margin-top:50px;">
-        <p>{{ post }}</p>
+<main id="app">
+{{ posts }}
+    <section class="py-5 text-center container">
+        <div class="row py-lg-5">
+            <div class="col-lg-6 col-md-8 mx-auto">
+                <h1 class="fw-light">All posts</h1>
+                <p class="lead text-muted">Only authorized users can leave coments and add or change posts</p>
+                <p>
+                    <span v-if="posts.IsAuthorized">
+                        <a href="/post" class="btn btn-secondary my-2">Create Post</a>
+                    <a  href="/logout" class="btn my-2">Logout</a>
+                    </span>
+                    <a v-else href="/authorisation" class="btn btn-primary my-2">Authorisation</a>
 
 
-    </div>
-    <div class="container"   style="margin-top:50px;">
-        <div class="text-muted py-2">
-            <button class="btn btn-sm btn-outline-secondary" style="margin: auto">Add coment</button>
+                </p>
+            </div>
         </div>
+    </section>
+
+    <div class="album py-5 bg-light">
+        <div class="container" >
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
 
 
+
+            </div>
+        </div>
     </div>
-</main>
+  </main>
 
 <footer class="text-muted py-5">
     <div class="container">
@@ -68,25 +91,24 @@
             <a href="#">Back to top</a>
         </p>
         <p class="mb-1">Album example is © Bootstrap</p>
-        <p class="mb-0">New to Bootstrap? <a href="/">Visit the homepage</a> or read our <a href="/docs/5.0/getting-started/introduction/">getting started guide</a>.</p>
+
     </div>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 <script>
-      new Vue({
-  el: '#app_2',
+    new Vue({
+  el: '#app',
   data: {
-   post: {}
+   posts: [],
   },
-  mounted() {
-    fetch("/posts/66")
-      .then(response =>response.json())
-      .then((data)=>{
-       this.post = data;
-       console.log(data);
-  })
-  }
+   created: function() {
+        // используем $http-клиента из vue-resource для получения данных от роута /tasks
+                    this.$http.get('https://jsonplaceholder.typicode.com/posts/5').then(function(response) {
+                        this.posts = response.data.items ? response.data.items : []
+                        console.log(data)
+                    })
+                }
 })
 </script>
 

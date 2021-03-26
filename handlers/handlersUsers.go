@@ -127,7 +127,7 @@ fb:= config.GetConfig("fb")
 	}
 	Google := GoogleConfig.AuthCodeURL("")
 fmt.Println(FB, Google)
-	return c.Render(http.StatusOK, "authorisation.html", map[string]string{
+	return c.JSON(http.StatusOK, map[string]string{
 		"FB":     FB,
 		"Google": Google,
 	})
