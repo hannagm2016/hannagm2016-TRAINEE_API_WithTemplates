@@ -5,8 +5,8 @@ import (
 	"github.com/labstack/echo"
 	"net/http"
 	"site/models"
-	"strconv"
 	"site/repository"
+	"strconv"
 )
 
 const (
@@ -40,7 +40,7 @@ func (h *handler) Index(c echo.Context) error {
 	}
 	Model.Posts = Posts
 	Model.Cust = Customer
-    	  fmt.Println("Endpoint Hit: Index" )
+	fmt.Println("Endpoint Hit: Index")
 	return c.JSON(http.StatusOK, Model)
 }
 
@@ -58,7 +58,7 @@ func (h *handler) ReturnSinglePost(c echo.Context) error {
 	id := c.Param("id")
 	key, _ := strconv.ParseFloat(string(id), 64)
 	post := h.PostModel.FindByID(key)
-	fmt.Println("Endpoint Hit: Post - ", id )
+	fmt.Println("Endpoint Hit: Post - ", id)
 	return c.JSON(http.StatusOK, post)
 }
 

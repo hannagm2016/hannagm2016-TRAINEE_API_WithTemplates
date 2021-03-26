@@ -9,12 +9,12 @@ import (
 	"golang.org/x/oauth2"
 	"log"
 	"net/http"
+	"site/config"
 	"site/models"
 	"site/session"
 	"strconv"
 	"strings"
 	"time"
-	"site/config"
 )
 
 var inMemorySession *session.Session
@@ -101,9 +101,9 @@ func (h *handler) Authorisation(c echo.Context) error {
 
 	inMemorySession = session.NewSession()
 	fmt.Println("Endpoint Hit: authorisation")
-fb:= config.GetConfig("fb")
+	fb := config.GetConfig("fb")
 	fbConfig := &oauth2.Config{
-	    ClientID: fb.ClientID,
+		ClientID:     fb.ClientID,
 		ClientSecret: fb.ClientSecret,
 		RedirectURL:  fb.RedirectURL,
 		Scopes:       []string{"email", "user_birthday", "user_location"},
@@ -113,11 +113,11 @@ fb:= config.GetConfig("fb")
 		},
 	}
 	FB := fbConfig.AuthCodeURL("")
-	google:=config.GetConfig("google")
+	google := config.GetConfig("google")
 	GoogleConfig := oauth2.Config{
-		ClientID: google.ClientID,
-        ClientSecret: google.ClientSecret,
-        RedirectURL:  google.RedirectURL,
+		ClientID:     google.ClientID,
+		ClientSecret: google.ClientSecret,
+		RedirectURL:  google.RedirectURL,
 		Scopes:       []string{"email"},
 		Endpoint: oauth2.Endpoint{
 			AuthURL:   "https://accounts.google.com/o/oauth2/auth",
@@ -126,7 +126,7 @@ fb:= config.GetConfig("fb")
 		},
 	}
 	Google := GoogleConfig.AuthCodeURL("")
-fmt.Println(FB, Google)
+	fmt.Println(FB, Google)
 	return c.JSON(http.StatusOK, map[string]string{
 		"FB":     FB,
 		"Google": Google,
@@ -135,7 +135,7 @@ fmt.Println(FB, Google)
 
 func (h *handler) FBLogin(c echo.Context) error {
 	code := c.FormValue("code")
-	fb:= config.GetConfig("fb")
+	fb := config.GetConfig("fb")
 	accessToken := GetAccessToken(fb.ClientID, code, fb.ClientSecret, fb.RedirectURL)
 	response, err := http.Get("https://graph.facebook.com/me?access_token=" + accessToken.Token)
 	if err != nil {
@@ -166,7 +166,7 @@ func (h *handler) FBLogin(c echo.Context) error {
 }
 func (h *handler) GoogleLogin(c echo.Context) error {
 	code := c.FormValue("code")
-	google:=config.GetConfig("google")
+	google := config.GetConfig("google")
 	accessToken := GetAccessToken(google.ClientID, code, google.ClientSecret, google.RedirectURL)
 	response, err := http.Get("https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=" + accessToken.Token)
 	if err != nil {
