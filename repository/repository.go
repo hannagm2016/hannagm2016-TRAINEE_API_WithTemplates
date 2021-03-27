@@ -46,7 +46,10 @@ func (p *PostModel) DeleteByID(id float64) {
 func (p *PostModel) SaveByID(post models.Post) {
 	if post.Id != 0 {
 		p.db.Save(&post)
+			fmt.Println(post.Id, "000")
+
 	} else {
+	fmt.Println(post.Id, "!!!!000")
 		p.db.Create(&post)
 	}
 	fmt.Println("**")

@@ -100,7 +100,7 @@ func GetAccessToken(client_id string, code string, secret string, callbackUri st
 func (h *handler) Authorisation(c echo.Context) error {
 
 	inMemorySession = session.NewSession()
-	fmt.Println("Endpoint Hit: authorisation")
+	fmt.Println("Endpoint Hit: Authorisation")
 	fb := config.GetConfig("fb")
 	fbConfig := &oauth2.Config{
 		ClientID:     fb.ClientID,
@@ -162,7 +162,7 @@ func (h *handler) FBLogin(c echo.Context) error {
 	}
 	fmt.Println(Customer)
 	fmt.Println("Endpoint Hit: FBLogin", cookie)
-	return c.Redirect(http.StatusMovedPermanently, "/")
+	return c.String(http.StatusOK, Customer.Name)
 }
 func (h *handler) GoogleLogin(c echo.Context) error {
 	code := c.FormValue("code")

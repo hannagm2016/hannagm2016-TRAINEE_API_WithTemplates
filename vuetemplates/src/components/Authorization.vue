@@ -17,11 +17,12 @@
     </form>
 
     <title>Golang Login Facebook/Google</title>
-<p>{{link.FB}}</p>
+ <a v-bind:href="link.FB">
         <button>Login with Facebook!</button> </a>
-    <p>{{link.Google}}</p>
+         <a v-bind:href= "link.Google">
+
         <button>Login with Google!</button> </a>
-    <div class="text-muted py-2" style="text-align:center;">
+          <div class="text-muted py-2" style="text-align:center;">
 
 </div>
 
@@ -35,33 +36,21 @@
 
 <script>
 export default {
-  data: function(){
-    return {
-      link: null
-    }
-  },
-  watch: {
-    '$route' (to,from){
-      this.getData()
-    }
-  },
-  methods: {
-    getData (){
-     var that=this
-      axios.get ('http://localhost:8000/authorization')
-        .then(function (response) {
-        that.link = response.data
-        console.log (link)
-        })
-    }
-  },
-  mounted: function (){
-    this.getData()
-  }
-}
+   data () {
+
+     return {
+     link: [],
+     }
+   },
+    mounted() {
+       fetch("http://localhost:8000/authorization")
+         .then(response =>response.json())
+         .then((data)=>{
+          this.link = data;
+         })
+     },
+ }
 </script>
-
-
 
 <style>
 

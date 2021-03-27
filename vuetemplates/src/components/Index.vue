@@ -27,7 +27,7 @@
                                 <div class="btn-group">
                                     <a v-bind:href="'/#/post/'+ post.Id"  class="btn btn-sm btn-outline-secondary">View</a>
                                     <a v-bind:href="'/#/edit/'+ post.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                    <button v-on:click="deletePost(post.Id)"  class="btn btn-sm btn-outline-secondary">Delete</button>
+                                    <button v-on:click="deletePost(post.Id)" class="btn btn-sm btn-outline-secondary">Delete</button>
                                 </div>
                                 <small class="text-muted">{{ post.UserId }}</small>
                             </div>
@@ -55,15 +55,29 @@ export default {
          this.posts = data;
         })
     },
+      watch: {
+        '$route' (to,from){
+          this.deletePost()
+        }
+      },
+
    methods: {
         deletePost(id) {
             fetch("http://localhost:8000/deletePost/"+id, {
                 method:"DELETE"
             })
-            .then(() => {
-              console.log("DELETED", id)
-            })
-        }
+            event.preventDefault()
+            alert ("post deleted")
+            window.location = '/'
+        },
+         mess: function (message, event) {
+             if (event) {
+                  event.preventDefault()
+                }
+                  alert(message);
+
+                 },
+
    }
 }
 </script>

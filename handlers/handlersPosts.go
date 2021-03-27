@@ -58,7 +58,7 @@ func (h *handler) ReturnSinglePost(c echo.Context) error {
 	id := c.Param("id")
 	key, _ := strconv.ParseFloat(string(id), 64)
 	post := h.PostModel.FindByID(key)
-	fmt.Println("Endpoint Hit: Post - ", id)
+	fmt.Println("Endpoint Hit: ReturnSinglePost - ", id)
 	return c.JSON(http.StatusOK, post)
 }
 
@@ -75,15 +75,15 @@ func (h *handler) ReturnSinglePost(c echo.Context) error {
 // @Router /deletePost/{id} [delete]
 func (h *handler) DeletePost(c echo.Context) error {
 	cookie, _ = c.Cookie(COOKIE_NAME)
-	if cookie == nil {
+	/*if cookie == nil {
 		//c.String(http.StatusForbidden, "Not registered")
 		return c.Redirect(http.StatusMovedPermanently, "/")
-	}
+	}*/
 	id := c.Param("id")
 	key, _ := strconv.ParseFloat(string(id), 64)
 	h.PostModel.DeleteByID(key)
 	fmt.Println("Endpoint Hit: DeletePost", id)
-	return c.Redirect(http.StatusMovedPermanently, "/")
+	return c.String(http.StatusOK, "Deleted")
 }
 
 // SavePost godoc
@@ -99,12 +99,13 @@ func (h *handler) DeletePost(c echo.Context) error {
 func (h *handler) SavePost(c echo.Context) error {
 	var post models.Post
 	post.Id, _ = strconv.ParseFloat(c.FormValue("id"), 0)
+	post.UserId, _ = strconv.ParseFloat(c.FormValue("userid"), 0)
 	post.Title = c.FormValue("title")
 	post.Body = c.FormValue("body")
-	post.UserId = Customer.Id //Later would be User ID from authorisation
+	fmt.Println(post)
 	h.PostModel.SaveByID(post)
 
-	fmt.Println("Endpoint Hit: InsertrPost")
+	fmt.Println("Endpoint Hit: SavePost", post.Id)
 	return c.String(http.StatusOK, "Saved")
 }
 
