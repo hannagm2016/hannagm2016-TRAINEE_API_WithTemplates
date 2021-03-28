@@ -63,12 +63,13 @@ export default {
 
    methods: {
         deletePost(id) {
+       if (confirm ("Delete post?")) {
             fetch("http://localhost:8000/deletePost/"+id, {
                 method:"DELETE"
             })
             event.preventDefault()
-            alert ("post deleted")
-            window.location = '/'
+
+            window.location = '/'}
         },
          mess: function (message, event) {
              if (event) {

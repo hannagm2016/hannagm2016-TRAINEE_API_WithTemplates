@@ -98,15 +98,13 @@ func (h *handler) DeletePost(c echo.Context) error {
 // @Router /savePost [post]
 func (h *handler) SavePost(c echo.Context) error {
 	var post models.Post
-	post.Id, _ = strconv.ParseFloat(c.FormValue("id"), 0)
-	post.UserId, _ = strconv.ParseFloat(c.FormValue("userid"), 0)
-	post.Title = c.FormValue("title")
-	post.Body = c.FormValue("body")
+if err:=c.Bind (&post); err !=nil {
+    return err
+}
 	fmt.Println(post)
 	h.PostModel.SaveByID(post)
-
 	fmt.Println("Endpoint Hit: SavePost", post.Id)
-	return c.String(http.StatusOK, "Saved")
+	return c.JSON(http.StatusOK, post)
 }
 
 // CreateNewPost godoc
