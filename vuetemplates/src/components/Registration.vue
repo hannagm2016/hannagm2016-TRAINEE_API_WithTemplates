@@ -2,15 +2,12 @@
 <div>
 
 <main class="form-signin">
-    <form role="form" method="POST" action="http://localhost:8000/registrationPost">
+    <form @submit.prevent="registrateUser">
         <h1 class="h3 mb-3 fw-normal">Please Registrate</h1>
-        <!--<label for="inputEmail" class="visually-hidden">Email address</label>-->
-        <input type="text" id="inputName"  name="inputName" class="form-control" placeholder="Name" required="" autofocus="">
-        <input type="email" id="inputEmail"  name="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
-        <!-- <label for="inputPassword" class="visually-hidden">Password</label>-->
-        <input type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required="">
-        <input type="password" id="inputPassword2" name="inputPassword" class="form-control" placeholder="Confirm Password" required="">
-
+         <input v-model="User.Name" type="text"  id="inputName" class="form-control" placeholder="Name" required="" autofocus="">
+        <input v-model="User.Email" type="email" id="inputEmail"  name="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+         <input v-model="User.Password" type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required="">
+        <input v-model="User.Password2" type="password" id="inputPassword2" name="inputPassword" class="form-control" placeholder="Confirm Password" required="">
         <button class="w-100 btn btn-lg btn-primary" type="submit">Registrate</button>
     </form>
     <div class="text-muted py-3">
@@ -21,12 +18,32 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
-  data: function(){
-    return {
-      link: null
-    }
-  },
+   data: () => ({
+      User: {
+        Name: '',
+        Email: '',
+        Password: '123',
+        Password2: '123'
+      }
+    }),
+    methods: {
+      registrateUser() {
+      axios.post (`http://localhost:8000/registrationPost`, {
+                     Name: this.User.Name,
+                     UserName: this.User.Name,
+                     Email: this.User.Email,
+                     Password: this.User.Password,
+                     //Password2: this.User.Password2,
+                })
+                 .then (response => {
+                console.log (response)
+               alert ("Registered: " + this.User.Name)
+                 })
+                  window.location = '/'
+             }
+}
 }
 </script>
 

@@ -246,12 +246,19 @@ func (h *handler) Registration(c echo.Context) error {
 // @Failure 500 {string} string "fail"
 // @Router /registrationPost [post]
 func (h *handler) RegistrationPost(c echo.Context) error {
+	var user models.User
+if err:=c.Bind (&user); err !=nil {
+    return err
+}
+	fmt.Println(user)
+	//h.PostModel.SaveByID(post)
+	fmt.Println("Endpoint Hit: SaveUser", user.Name)
 
-	Customer.Name = c.FormValue("inputName")
+	/*Customer.Name = c.FormValue("inputName")
 	Customer.Email = c.FormValue("inputEmail")
 	Customer.Password = c.FormValue("inputPassword")
-	Customer.UserName = c.FormValue("inputName")
-	h.PostModel.CreateUser(Customer)
+	Customer.UserName = c.FormValue("inputName")*/
+	h.PostModel.CreateUser(user)
 	Customer.Id = h.PostModel.FindCustomerId(Customer.UserName)
 	sessionId := inMemorySession.Init(Customer.Email)
 	cookie = &http.Cookie{
@@ -262,7 +269,7 @@ func (h *handler) RegistrationPost(c echo.Context) error {
 	}
 	c.SetCookie(cookie)
 
-	return c.Redirect(http.StatusMovedPermanently, "/")
+	return c.JSON(http.StatusOK, user)
 }
 
 // Logout godoc

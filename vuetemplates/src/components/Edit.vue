@@ -10,8 +10,7 @@
                         <input v-model="posts.Title" type="text" id="title" placeholder="Title of your post" class="form-control"><br>
                         <textarea name="body"  v-model="posts.Body" placeholder="Body of your post" class="form-control"></textarea><br>
                         <button type="submit" class="btn btn-primary my-2" >Save</button>
-                         <button type="submit" v-on:click="savePost(posts)" class="btn btn-sm btn-outline-secondary">Delete</button>
-                    </form>
+                       </form>
                     <p>{{posts.Id}}</p>
                 </div>
 
