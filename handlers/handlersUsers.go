@@ -126,7 +126,6 @@ func (h *handler) Authorisation(c echo.Context) error {
 		},
 	}
 	Google := GoogleConfig.AuthCodeURL("")
-	fmt.Println(FB, Google)
 	return c.JSON(http.StatusOK, map[string]string{
 		"FB":     FB,
 		"Google": Google,
@@ -205,35 +204,28 @@ func (h *handler) GoogleLogin(c echo.Context) error {
 // @Failure 500 {string} string "fail"
 // @Router /authorisationPost [post]
 func (h *handler) AuthorisationPost(c echo.Context) error {
-	inputEmail := c.FormValue("inputEmail")
-	inputPassword := c.FormValue("inputPassword")
-	fmt.Println(inputPassword, inputEmail)
-	sessionId := inMemorySession.Init(inputEmail)
+	var user models.User
+    if err:=c.Bind (&user); err !=nil {
+        return err
+    }
+    Customer := h.PostModel.FindCustomerByEmail(user.Email)
+    if Customer.Name !="" {
+	sessionId := inMemorySession.Init(user.Email)
 	cookie = &http.Cookie{
 		Name:    COOKIE_NAME,
 		Value:   sessionId,
 		Expires: time.Now().Add(5 * time.Minute),
 		MaxAge:  60 * 60,
 	}
-	Customer = h.PostModel.FindCustomerByEmail(inputEmail)
-
+fmt.Println("cookie setted")
 	c.SetCookie(cookie)
-	fmt.Println("Endpoint Hit: authorisation", Customer)
-	return c.Redirect(http.StatusMovedPermanently, "/")
-}
+		fmt.Println("Endpoint Hit: authorisation", Customer)
+    	return c.JSON(http.StatusOK, Customer)
+	} else {
+			fmt.Println("Endpoint Hit: authorisation, not authorized")
+	 return c.String (http.StatusOK, "You are not authorized!")
+	}
 
-// Registration godoc
-// @Summary Registration form
-// @Description Creating user, cookie, set IsAuthorize as true
-// @Tags User
-// @Accept  json
-// @Produce  json
-// @Success 200 {string} string "redirect to registrationPost"
-// @Failure 500 {string} string "fail"
-// @Router /registration [get]
-func (h *handler) Registration(c echo.Context) error {
-	fmt.Println("Endpoint Hit: registration")
-	return c.Render(http.StatusOK, "registration.html", map[string]interface{}{})
 }
 
 // RegistrationPost godoc

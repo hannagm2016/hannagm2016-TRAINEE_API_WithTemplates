@@ -46,11 +46,10 @@ func main() {
 	e.GET("/posts/:id", h.ReturnSinglePost)//was GET
 	e.GET("/authorization", h.Authorisation)
 	e.GET("/logout", h.Logout)
-	e.GET("/registration", h.Registration)
 	e.GET("/FBLogin", h.FBLogin)
 	e.GET("/GoogleLogin", h.GoogleLogin)
 	e.DELETE("/deletePost/:id", h.DeletePost)
-	e.POST("/authorisationPost", h.AuthorisationPost)
+	e.POST("/authorizationPost", h.AuthorisationPost)
 	e.POST("/registrationPost", h.RegistrationPost)
 	e.POST("/savePost", h.SavePost)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)

@@ -2,28 +2,20 @@
 <div>
 
 <main class="form-signin">
-    <form role="form" method="POST" action="http://localhost:8000/authorisationPost">
-        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-        <!--<label for="inputEmail" class="visually-hidden">Email address</label>-->
-        <input type="email" id="inputEmail"  name="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
-       <!-- <label for="inputPassword" class="visually-hidden">Password</label>-->
-        <input type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required="">
-        <div class="checkbox mb-3">
-            <label>
-                <input type="checkbox" value="remember-me"> Remember me
-            </label>
-        </div>
-        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-    </form>
-
-    <title>Golang Login Facebook/Google</title>
- <a v-bind:href="link.FB">
+ <form @submit.prevent="authorizeUser">
+         <h1 class="h3 mb-3 fw-normal">Please Registrate</h1>
+          <input v-model="User.Email" type="email" id="inputEmail"  name="inputEmail" class="form-control" placeholder="Email address" required="" autofocus="">
+          <input v-model="User.Password" type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required="">
+         <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+          <label>
+               <input type="checkbox" value="remember-me"> Remember me
+          </label>
+                 </form>
+       <div class="text-muted py-2">
+        <a v-bind:href="link.FB">
         <button>Login with Facebook!</button> </a>
          <a v-bind:href= "link.Google">
-
         <button>Login with Google!</button> </a>
-          <div class="text-muted py-2" style="text-align:center;">
-
 </div>
 
     <div class="text-muted py-3">
@@ -35,13 +27,15 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
-   data () {
-
-     return {
-     link: [],
-     }
-   },
+   data: () => ({
+      User: {
+        Email: '',
+        Password: '123',
+      },
+       link: []
+    }),
     mounted() {
        fetch("http://localhost:8000/authorization")
          .then(response =>response.json())
@@ -49,6 +43,21 @@ export default {
           this.link = data;
          })
      },
+      methods: {
+          authorizeUser() {
+           axios.post (`http://localhost:8000/authorizationPost`, {
+                          Email: this.User.Email,
+                          Password: this.User.Password,
+
+                     })
+                      .then (response => {
+                     console.log (response)
+                      alert ("Authorized: " + this.User.Email)
+
+                      })
+                       window.location = '/'
+                  }
+     }
  }
 </script>
 
